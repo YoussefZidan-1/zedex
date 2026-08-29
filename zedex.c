@@ -7,18 +7,24 @@
 #include <termios.h>
 #include <unistd.h>
 
+/*** defines ***/
+
+#define CTRL_KEY(k) ((k) & 0x1f)
+
 /*** data ***/
 
 struct termios orig_termios;
 
 /*** terminal ***/
 
-void die(const char *s) {
+void die(const char *s) 
+{
   perror(s);
   exit(1);
 }
 
-void disableRawMode() {
+void disableRawMode() 
+{
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
     die("tcsetattr");
 }
@@ -41,18 +47,22 @@ void enableRawMode()
 
 /*** init ***/
 
-int main() {
+int main() 
+{
   enableRawMode();
-  while (1) {
+  while (1) 
+  {
     char c = '\0';
     if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) die("read");
-    if (iscntrl(c)) {
+    if (iscntrl(c)) 
+    {
       printf("%d\r\n", c);
-    } else {
+    } 
+    else 
+    {
       printf("%d ('%c')\r\n", c, c);
     }
-    if (c == 'q')
-      break;
+    if (c == CTRL_KEY('q')) break;
   }
 
   return 0;
